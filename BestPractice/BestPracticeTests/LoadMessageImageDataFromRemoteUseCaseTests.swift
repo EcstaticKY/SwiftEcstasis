@@ -15,11 +15,18 @@ final class RemoteMessageImageDataLoader {
     
     enum Error: Swift.Error {
         case connectivity
+        case invalidData
     }
     
     func load(from url: URL, completion: @escaping (Error) -> Void) {
-        client.get(from: url) { _ in
-            completion(.connectivity)
+        client.get(from: url) { result in
+            switch result {
+            case .success:
+                completion(.invalidData)
+            case .failure:
+                completion(.connectivity)
+            }
+            
         }
     }
 }
@@ -65,6 +72,22 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         XCTAssertEqual(receivedErrors, [.connectivity])
     }
     
+    func test_load_failsOnEmptyDataWith200StatusCodeResponse() {
+        let (sut, client) = makeSUT()
+
+        let exp = expectation(description: "Wait for load completion")
+        
+        var receivedErrors = [RemoteMessageImageDataLoader.Error]()
+        sut.load(from: anyURL()) { error in
+            receivedErrors.append(error)
+            exp.fulfill()
+        }
+        client.completeWith(Data(), statusCode: 200)
+        
+        wait(for: [exp], timeout: 1.0)
+        XCTAssertEqual(receivedErrors, [.invalidData])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
@@ -90,6 +113,11 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         
         func completeWithError(at index: Int = 0) {
             completions[index](.failure(NSError(domain: "any error", code: 9)))
+        }
+        
+        func completeWith(_ data: Data, statusCode: Int, at index: Int = 0) {
+            let response = HTTPURLResponse(url: requestURLs[index], statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+            completions[index](.success((data, response)))
         }
     }
     
