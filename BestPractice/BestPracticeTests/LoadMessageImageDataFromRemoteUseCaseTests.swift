@@ -22,6 +22,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
 
     func test_init_doesNotRequestImageData() {
         let (_, client) = makeSUT()
+        
         XCTAssertTrue(client.requestURLs.isEmpty)
     }
     
@@ -31,6 +32,15 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         
         sut.load(from: url)
         XCTAssertEqual(client.requestURLs, [url])
+    }
+    
+    func test_loadTwice_requestImageDataTwice() {
+        let url = anyURL()
+        let (sut, client) = makeSUT()
+        
+        sut.load(from: url)
+        sut.load(from: url)
+        XCTAssertEqual(client.requestURLs, [url, url])
     }
     
     // MARK: - Helpers
