@@ -22,8 +22,10 @@ final class RemoteMessageImageDataLoader {
     func load(from url: URL, completion: @escaping (Result) -> Void) {
         client.get(from: url) { result in
             switch result {
-            case let .success((data, _)):
-                guard data.count > 0 else { return completion(.failure(.invalidData)) }
+            case let .success((data, response)):
+                guard data.count > 0 && response.statusCode == 200 else {
+                    return completion(.failure(.invalidData))
+                }
                 completion(.success(data))
             case .failure:
                 completion(.failure(.connectivity))
@@ -66,20 +68,33 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         }
     }
     
-    func test_load_failsOnEmptyDataWith200StatusCodeResponse() {
+    func test_load_deliversInvalidDataOnNon200StatusCodeResponse() {
         let (sut, client) = makeSUT()
+        let anyData = Data("any data".utf8)
+        
+        let samples = [199, 201, 250, 300, 404, 500]
+        samples.enumerated().forEach { index, statusCode in
+            expect(sut, toCompleteWith: .failure(.invalidData)) {
+                client.completeWith(anyData, statusCode: statusCode, at: index)
+            }
+        }
+    }
+    
+    func test_load_deliversInvalidDataOnEmptyDataWith200StatusCodeResponse() {
+        let (sut, client) = makeSUT()
+        let emptyData = Data()
         
         expect(sut, toCompleteWith: .failure(.invalidData)) {
-            client.completeWith(Data(), statusCode: 200)
+            client.completeWith(emptyData, statusCode: 200)
         }
     }
     
     func test_load_deliversDataOn200StatusCodeResponse() {
         let (sut, client) = makeSUT()
-        let data = Data("any data".utf8)
+        let anyData = Data("any data".utf8)
 
-        expect(sut, toCompleteWith: .success(data)) {
-            client.completeWith(data, statusCode: 200)
+        expect(sut, toCompleteWith: .success(anyData)) {
+            client.completeWith(anyData, statusCode: 200)
         }
     }
     
