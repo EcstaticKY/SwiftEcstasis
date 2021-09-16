@@ -35,9 +35,12 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func makeSUT() -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
+        
         let client = HTTPClientSpy()
         let sut = RemoteMessageImageDataLoader(client: client)
+        trackForMemoryLeak(client, file: file, line: line)
+        trackForMemoryLeak(sut, file: file, line: line)
         return (sut, client)
     }
     
@@ -49,6 +52,12 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         
         func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) {
             requestURLs.append(url)
+        }
+    }
+    
+    private func trackForMemoryLeak(_ obj: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
+        addTeardownBlock { [weak obj] in
+            XCTAssertNil(obj, "Instance should be deallocated. Potential memory leak", file: file, line: line)
         }
     }
 }
