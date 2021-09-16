@@ -13,8 +13,14 @@ final class RemoteMessageImageDataLoader {
         self.client = client
     }
     
-    func load(from url: URL) {
-        client.get(from: url) { _ in }
+    enum Error: Swift.Error {
+        case connectivity
+    }
+    
+    func load(from url: URL, completion: @escaping (Error) -> Void) {
+        client.get(from: url) { _ in
+            completion(.connectivity)
+        }
     }
 }
 
@@ -30,17 +36,33 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         let url = anyURL()
         let (sut, client) = makeSUT()
         
-        sut.load(from: url)
+        sut.load(from: url) { _ in }
         XCTAssertEqual(client.requestURLs, [url])
     }
     
-    func test_loadTwice_requestImageDataTwice() {
+    func test_loadTwice_requestsImageDataTwice() {
         let url = anyURL()
         let (sut, client) = makeSUT()
         
-        sut.load(from: url)
-        sut.load(from: url)
+        sut.load(from: url) { _ in }
+        sut.load(from: url) { _ in }
         XCTAssertEqual(client.requestURLs, [url, url])
+    }
+    
+    func test_load_failsOnClientError() {
+        let (sut, client) = makeSUT()
+
+        let exp = expectation(description: "Wait for load completion")
+        
+        var receivedErrors = [RemoteMessageImageDataLoader.Error]()
+        sut.load(from: anyURL()) { error in
+            receivedErrors.append(error)
+            exp.fulfill()
+        }
+        client.completeWithError()
+        
+        wait(for: [exp], timeout: 1.0)
+        XCTAssertEqual(receivedErrors, [.connectivity])
     }
     
     // MARK: - Helpers
@@ -59,9 +81,15 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     private class HTTPClientSpy: HTTPClient {
         
         var requestURLs = [URL]()
+        var completions = [(HTTPClient.Result) -> Void]()
         
         func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) {
             requestURLs.append(url)
+            completions.append(completion)
+        }
+        
+        func completeWithError(at index: Int = 0) {
+            completions[index](.failure(NSError(domain: "any error", code: 9)))
         }
     }
     
