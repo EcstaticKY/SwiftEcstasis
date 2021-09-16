@@ -6,35 +6,6 @@
 import XCTest
 import BestPractice
 
-final class RemoteMessageImageDataLoader {
-    private let client: HTTPClient
-    
-    init(client: HTTPClient) {
-        self.client = client
-    }
-    
-    enum Error: Swift.Error {
-        case connectivity
-        case invalidData
-    }
-    
-    typealias Result = Swift.Result<Data, Error>
-    func load(from url: URL, completion: @escaping (Result) -> Void) {
-        client.get(from: url) { result in
-            switch result {
-            case let .success((data, response)):
-                guard data.count > 0 && response.statusCode == 200 else {
-                    return completion(.failure(.invalidData))
-                }
-                completion(.success(data))
-            case .failure:
-                completion(.failure(.connectivity))
-            }
-            
-        }
-    }
-}
-
 class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
 
     func test_init_doesNotRequestImageData() {

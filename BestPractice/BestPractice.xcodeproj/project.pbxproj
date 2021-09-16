@@ -10,6 +10,7 @@
 		3863CB9926F3098B00D023B6 /* BestPractice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3863CB8F26F3098B00D023B6 /* BestPractice.framework */; };
 		3863CBAA26F321B100D023B6 /* LoadMessageImageDataFromRemoteUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3863CBA926F321B100D023B6 /* LoadMessageImageDataFromRemoteUseCaseTests.swift */; };
 		3863CBAC26F322B400D023B6 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3863CBAB26F322B400D023B6 /* HTTPClient.swift */; };
+		3863CBAE26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3863CBAD26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		3863CB9F26F3098B00D023B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3863CBA926F321B100D023B6 /* LoadMessageImageDataFromRemoteUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMessageImageDataFromRemoteUseCaseTests.swift; sourceTree = "<group>"; };
 		3863CBAB26F322B400D023B6 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		3863CBAD26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMessageImageDataLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 			children = (
 				3863CB9326F3098B00D023B6 /* Info.plist */,
 				3863CBAB26F322B400D023B6 /* HTTPClient.swift */,
+				3863CBAD26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift */,
 			);
 			path = BestPractice;
 			sourceTree = "<group>";
@@ -195,6 +198,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3863CBAE26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift in Sources */,
 				3863CBAC26F322B400D023B6 /* HTTPClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
