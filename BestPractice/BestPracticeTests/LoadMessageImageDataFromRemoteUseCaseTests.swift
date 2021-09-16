@@ -58,34 +58,18 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     
     func test_load_failsOnClientError() {
         let (sut, client) = makeSUT()
-
-        let exp = expectation(description: "Wait for load completion")
         
-        var receivedErrors = [RemoteMessageImageDataLoader.Error]()
-        sut.load(from: anyURL()) { error in
-            receivedErrors.append(error)
-            exp.fulfill()
+        expect(sut, toCompleteWithError: .connectivity) {
+            client.completeWithError()
         }
-        client.completeWithError()
-        
-        wait(for: [exp], timeout: 1.0)
-        XCTAssertEqual(receivedErrors, [.connectivity])
     }
     
     func test_load_failsOnEmptyDataWith200StatusCodeResponse() {
         let (sut, client) = makeSUT()
-
-        let exp = expectation(description: "Wait for load completion")
         
-        var receivedErrors = [RemoteMessageImageDataLoader.Error]()
-        sut.load(from: anyURL()) { error in
-            receivedErrors.append(error)
-            exp.fulfill()
+        expect(sut, toCompleteWithError: .invalidData) {
+            client.completeWith(Data(), statusCode: 200)
         }
-        client.completeWith(Data(), statusCode: 200)
-        
-        wait(for: [exp], timeout: 1.0)
-        XCTAssertEqual(receivedErrors, [.invalidData])
     }
     
     // MARK: - Helpers
@@ -97,6 +81,24 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         trackForMemoryLeak(client, file: file, line: line)
         trackForMemoryLeak(sut, file: file, line: line)
         return (sut, client)
+    }
+    
+    private func expect(_ sut: RemoteMessageImageDataLoader,
+                        toCompleteWithError error: RemoteMessageImageDataLoader.Error,
+                        when action: () -> Void) {
+        
+        let exp = expectation(description: "Wait for load completion")
+        
+        var receivedErrors = [RemoteMessageImageDataLoader.Error]()
+        sut.load(from: anyURL()) { error in
+            receivedErrors.append(error)
+            exp.fulfill()
+        }
+        
+        action()
+        
+        wait(for: [exp], timeout: 1.0)
+        XCTAssertEqual(receivedErrors, [error])
     }
     
     private func anyURL() -> URL { URL(string: "https://any-url.com")! }
