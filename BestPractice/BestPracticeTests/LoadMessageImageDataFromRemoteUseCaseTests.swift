@@ -108,22 +108,23 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     private func anyData() -> Data { Data("any data".utf8) }
     
     private class HTTPClientSpy: HTTPClient {
-        
-        var requestURLs = [URL]()
-        var completions = [(HTTPClient.Result) -> Void]()
+
+        var messages = [(url: URL, completion: (HTTPClient.Result) -> Void)]()
+        var requestURLs: [URL] {
+            messages.map { $0.url }
+        }
         
         func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) {
-            requestURLs.append(url)
-            completions.append(completion)
+            messages.append((url, completion))
         }
         
         func completeWithError(at index: Int = 0) {
-            completions[index](.failure(NSError(domain: "any error", code: 9)))
+            messages[index].completion(.failure(NSError(domain: "any error", code: 9)))
         }
         
         func completeWith(_ data: Data, statusCode: Int, at index: Int = 0) {
             let response = HTTPURLResponse(url: requestURLs[index], statusCode: statusCode, httpVersion: nil, headerFields: nil)!
-            completions[index](.success((data, response)))
+            messages[index].completion(.success((data, response)))
         }
     }
     
