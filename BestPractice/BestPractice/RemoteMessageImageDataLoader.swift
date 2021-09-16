@@ -5,6 +5,10 @@
 
 import Foundation
 
+public protocol MessageImageDataLoadTask {
+    func cancel()
+}
+
 public final class RemoteMessageImageDataLoader {
     private let client: HTTPClient
     
@@ -17,9 +21,19 @@ public final class RemoteMessageImageDataLoader {
         case invalidData
     }
     
+    private struct HTTPClientWrappedTask: MessageImageDataLoadTask {
+        let wrapped: HTTPClientTask
+        
+        func cancel() {
+            wrapped.cancel()
+        }
+    }
+    
     public typealias Result = Swift.Result<Data, Error>
-    public func load(from url: URL, completion: @escaping (Result) -> Void) {
-        client.get(from: url) { result in
+    
+    @discardableResult
+    public func load(from url: URL, completion: @escaping (Result) -> Void) -> MessageImageDataLoadTask {
+        let task = client.get(from: url) { result in
             switch result {
             case let .success((data, response)):
                 guard data.count > 0 && response.statusCode == 200 else {
@@ -30,5 +44,7 @@ public final class RemoteMessageImageDataLoader {
                 completion(.failure(.connectivity))
             }
         }
+        
+        return HTTPClientWrappedTask(wrapped: task)
     }
 }
