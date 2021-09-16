@@ -18,13 +18,15 @@ final class RemoteMessageImageDataLoader {
         case invalidData
     }
     
-    func load(from url: URL, completion: @escaping (Error) -> Void) {
+    typealias Result = Swift.Result<Data, Error>
+    func load(from url: URL, completion: @escaping (Result) -> Void) {
         client.get(from: url) { result in
             switch result {
-            case .success:
-                completion(.invalidData)
+            case let .success((data, _)):
+                guard data.count > 0 else { return completion(.failure(.invalidData)) }
+                completion(.success(data))
             case .failure:
-                completion(.connectivity)
+                completion(.failure(.connectivity))
             }
             
         }
@@ -59,7 +61,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     func test_load_failsOnClientError() {
         let (sut, client) = makeSUT()
         
-        expect(sut, toCompleteWithError: .connectivity) {
+        expect(sut, toCompleteWith: .failure(.connectivity)) {
             client.completeWithError()
         }
     }
@@ -67,8 +69,17 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     func test_load_failsOnEmptyDataWith200StatusCodeResponse() {
         let (sut, client) = makeSUT()
         
-        expect(sut, toCompleteWithError: .invalidData) {
+        expect(sut, toCompleteWith: .failure(.invalidData)) {
             client.completeWith(Data(), statusCode: 200)
+        }
+    }
+    
+    func test_load_deliversDataOn200StatusCodeResponse() {
+        let (sut, client) = makeSUT()
+        let data = Data("any data".utf8)
+
+        expect(sut, toCompleteWith: .success(data)) {
+            client.completeWith(data, statusCode: 200)
         }
     }
     
@@ -84,21 +95,28 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     }
     
     private func expect(_ sut: RemoteMessageImageDataLoader,
-                        toCompleteWithError error: RemoteMessageImageDataLoader.Error,
-                        when action: () -> Void) {
+                        toCompleteWith expectedResult: RemoteMessageImageDataLoader.Result,
+                        when action: () -> Void,
+                        file: StaticString = #filePath,
+                        line: UInt = #line) {
         
         let exp = expectation(description: "Wait for load completion")
         
-        var receivedErrors = [RemoteMessageImageDataLoader.Error]()
-        sut.load(from: anyURL()) { error in
-            receivedErrors.append(error)
+        sut.load(from: anyURL()) { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case let (.success(receivedData), .success(expectedData)):
+                XCTAssertEqual(receivedData, expectedData, file: file, line: line)
+            case let (.failure(receivedError), .failure(expectedError)):
+                XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+            default:
+                XCTFail("Expected \(expectedResult), got \(receivedResult) instead.", file: file, line: line)
+            }
             exp.fulfill()
         }
         
         action()
         
         wait(for: [exp], timeout: 1.0)
-        XCTAssertEqual(receivedErrors, [error])
     }
     
     private func anyURL() -> URL { URL(string: "https://any-url.com")! }
