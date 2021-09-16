@@ -41,12 +41,11 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     
     func test_load_deliversInvalidDataOnNon200StatusCodeResponse() {
         let (sut, client) = makeSUT()
-        let anyData = Data("any data".utf8)
         
         let samples = [199, 201, 250, 300, 404, 500]
         samples.enumerated().forEach { index, statusCode in
             expect(sut, toCompleteWith: .failure(.invalidData)) {
-                client.completeWith(anyData, statusCode: statusCode, at: index)
+                client.completeWith(anyData(), statusCode: statusCode, at: index)
             }
         }
     }
@@ -62,10 +61,10 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     
     func test_load_deliversDataOn200StatusCodeResponse() {
         let (sut, client) = makeSUT()
-        let anyData = Data("any data".utf8)
+        let data = anyData()
 
-        expect(sut, toCompleteWith: .success(anyData)) {
-            client.completeWith(anyData, statusCode: 200)
+        expect(sut, toCompleteWith: .success(data)) {
+            client.completeWith(data, statusCode: 200)
         }
     }
     
@@ -106,6 +105,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     }
     
     private func anyURL() -> URL { URL(string: "https://any-url.com")! }
+    private func anyData() -> Data { Data("any data".utf8) }
     
     private class HTTPClientSpy: HTTPClient {
         
