@@ -33,7 +33,9 @@ public final class RemoteMessageImageDataLoader {
     
     @discardableResult
     public func load(from url: URL, completion: @escaping (Result) -> Void) -> MessageImageDataLoadTask {
-        let task = client.get(from: url) { result in
+        let task = client.get(from: url) { [weak self] result in
+            guard self != nil else { return }
+            
             switch result {
             case let .success((data, response)):
                 guard data.count > 0 && response.statusCode == 200 else {

@@ -68,6 +68,21 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         }
     }
     
+    func test_load_doesNotDeliverResultAfterInstanceHasBeenDeallocated() {
+        let client = HTTPClientSpy()
+        var sut: RemoteMessageImageDataLoader? = RemoteMessageImageDataLoader(client: client)
+        
+        var receivedResults = [RemoteMessageImageDataLoader.Result]()
+        sut?.load(from: anyURL()) { result in
+            receivedResults.append(result)
+        }
+        
+        sut = nil
+        client.completeWith(anyData(), statusCode: 200)
+        
+        XCTAssertTrue(receivedResults.isEmpty, "Expected no result, got \(receivedResults) instead")
+    }
+    
     func test_load_doesNotRequestsCancelling() {
         let (sut, client) = makeSUT()
         
