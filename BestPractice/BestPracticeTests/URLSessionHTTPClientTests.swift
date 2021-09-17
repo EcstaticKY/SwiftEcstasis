@@ -19,7 +19,11 @@ class URLSessionHTTPClient: HTTPClient {
     @discardableResult
     func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
         let task = session.dataTask(with: url) { data, response, error in
-            completion(.failure(UnexpectedValuesRepresentation()))
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.failure(UnexpectedValuesRepresentation()))
+            }
         }
         task.resume()
         return task
@@ -38,6 +42,27 @@ class URLSessionHTTPClientTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         URLProtocolStub.stopInterceptingRequest()
+    }
+    
+    func test_get_requestsWithURL() {
+        let sut = makeSUT()
+        let url = anyURL()
+        
+        let exp = expectation(description: "Wait for completion")
+        URLProtocolStub.observeRequest { request in
+            XCTAssertEqual(request.url, url)
+            exp.fulfill()
+        }
+        
+        sut.get(from: url) { _ in }
+        wait(for: [exp], timeout: 1.0)
+    }
+    
+    func test_get_failsOnRequestError() {
+        let error = anyNSError()
+        let receivedError = resultErrorFor(data: nil, response: nil, error: error) as NSError?
+        XCTAssertEqual(error.domain, receivedError?.domain)
+        XCTAssertEqual(error.code, receivedError?.code)
     }
     
     func test_get_failsOnAllInvalidResponseCases() {
@@ -112,13 +137,19 @@ class URLSessionHTTPClientTests: XCTestCase {
         }
         
         private static var stub: Stub?
+        private static var observer: ((URLRequest) -> Void)?
         
         static func stub(data: Data?, response: URLResponse?, error: Error?) {
             stub = Stub(data: data, response: response, error: error)
         }
         
+        static func observeRequest(_ observer: @escaping (URLRequest) -> Void) {
+            self.observer = observer
+        }
+        
         override class func canInit(with request: URLRequest) -> Bool {
-            true
+            observer?(request)
+            return true
         }
         
         override class func canonicalRequest(for request: URLRequest) -> URLRequest {
