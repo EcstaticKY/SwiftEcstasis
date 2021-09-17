@@ -137,8 +137,6 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         
         wait(for: [exp], timeout: 1.0)
     }
-
-    private func anyData() -> Data { Data("any data".utf8) }
     
     private class HTTPClientSpy: HTTPClient {
 
