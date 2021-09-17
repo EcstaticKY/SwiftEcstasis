@@ -173,10 +173,4 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
             messages[index].completion(.success((data, response)))
         }
     }
-    
-    private func trackForMemoryLeak(_ obj: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
-        addTeardownBlock { [weak obj] in
-            XCTAssertNil(obj, "Instance should be deallocated. Potential memory leak", file: file, line: line)
-        }
-    }
 }

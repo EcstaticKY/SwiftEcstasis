@@ -41,27 +41,54 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     func test_get_failsOnError() {
-        let sut = URLSessionHTTPClient()
         let error = NSError(domain: "any error", code: 0)
         
-        URLProtocolStub.stub(data: nil, response: nil, error: error)
+        expect(resultFor: (data: nil, response: nil, error: error), equalTo: .failure(error))
+    }
+    
+    // MARK: - Helpers
+    
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> URLSessionHTTPClient {
+        let sut = URLSessionHTTPClient()
+        trackForMemoryLeak(sut, file: file, line: line)
+        return sut
+    }
+    
+    private func expect(resultFor stub: (data: Data?, response: URLResponse?, error: Error?),
+                        equalTo expectedResult: HTTPClient.Result,
+                        file: StaticString = #filePath,
+                        line: UInt = #line) {
+        let receivedResult = resultFor(data: stub.data, response: stub.response, error: stub.error)
         
+        switch (receivedResult, expectedResult) {
+        case let (.success((receivedData, receivedResponse)), .success((expectedData, expectedResponse))):
+            XCTAssertEqual(receivedData, expectedData, "Data not equal. expected \(expectedResult) got \(receivedResult) instead", file: file, line: line)
+            XCTAssertEqual(receivedResponse.statusCode, expectedResponse.statusCode, "Response status code not equal. expected \(expectedResult) got \(receivedResult) instead", file: file, line: line)
+        case let (.failure(receivedError as NSError), .failure(expectedError as NSError)):
+            XCTAssertEqual(receivedError.domain, expectedError.domain, "Error domain not equal. expected \(expectedResult) got \(receivedResult) instead", file: file, line: line)
+            XCTAssertEqual(receivedError.code, expectedError.code, "Error domain not equal. expected \(expectedResult) got \(receivedResult) instead", file: file, line: line)
+        default:
+            XCTFail("Expected \(expectedResult) got \(receivedResult) instead", file: file, line: line)
+        }
+    }
+    
+    private func resultFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> HTTPClient.Result {
+        
+        URLProtocolStub.stub(data: data, response: response, error: error)
+        
+        var receivedResults = [HTTPClient.Result]()
         let exp = expectation(description: "Wait for get completion")
-        sut.get(from: anyURL()) { result in
-            switch result {
-            case .success:
-                XCTFail("Expected failure, got \(result) instead")
-            case let .failure(receivedError as NSError):
-                XCTAssertEqual(receivedError.domain, error.domain)
-                XCTAssertEqual(receivedError.code, error.code)
-            }
+        makeSUT().get(from: anyURL()) { result in
+            receivedResults.append(result)
             exp.fulfill()
         }
         
         wait(for: [exp], timeout: 1.0)
+        
+        XCTAssertEqual(receivedResults.count, 1, "Expected one result, got \(receivedResults.count) results instead", file: file, line: line)
+        
+        return receivedResults[0]
     }
-    
-    // MARK: - Helpers
     
     private class URLProtocolStub: URLProtocol {
         static func startInterceptingRequest() {
