@@ -76,9 +76,20 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         XCTAssertTrue(client.canceledURLs.isEmpty)
     }
     
+    func test_load_cancelsTaskOnCancelling() {
+        let (sut, client) = makeSUT()
+        let url = anyURL()
+        
+        let task = sut.load(from: url) { _ in }
+        task.cancel()
+        
+        XCTAssertEqual(client.canceledURLs, [url])
+    }
+    
     // MARK: - Helpers
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line)
+    -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
         
         let client = HTTPClientSpy()
         let sut = RemoteMessageImageDataLoader(client: client)
@@ -124,18 +135,23 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         var canceledURLs = [URL]()
         
         private struct HTTPClientTaskSpy: HTTPClientTask {
+            let url: URL
+            let callback: (URL) -> Void
+            
             func cancel() {
-                
+                callback(url)
             }
         }
         
         func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
             messages.append((url, completion))
-            return HTTPClientTaskSpy()
+            return HTTPClientTaskSpy(url: url) { url in
+                self.canceledURLs.append(url)
+            }
         }
         
         func completeWithError(at index: Int = 0) {
-            messages[index].completion(.failure(NSError(domain: "any error", code: 9)))
+            messages[index].completion(.failure(NSError(domain: "any error", code: 0)))
         }
         
         func completeWith(_ data: Data, statusCode: Int, at index: Int = 0) {
