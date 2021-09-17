@@ -20,10 +20,11 @@ class URLSessionHTTPClient: HTTPClient {
     func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
         let task = session.dataTask(with: url) { data, response, error in
             if let error = error {
-                completion(.failure(error))
-            } else {
-                completion(.failure(UnexpectedValuesRepresentation()))
+                return completion(.failure(error))
+            } else if let data = data, let response = response as? HTTPURLResponse {
+                return completion(.success((data, response)))
             }
+            completion(.failure(UnexpectedValuesRepresentation()))
         }
         task.resume()
         return task
@@ -58,7 +59,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
     
-    func test_get_failsOnRequestError() {
+    func test_get_failsOnOnlyRequestError() {
         let error = anyNSError()
         let receivedError = resultErrorFor(data: nil, response: nil, error: error) as NSError?
         XCTAssertEqual(error.domain, receivedError?.domain)
@@ -66,17 +67,14 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     func test_get_failsOnAllInvalidResponseCases() {
-        let anyHTTPURLResponse = HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)
+        let anyHTTPURLResponse = HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)!
         let anyNonHTTPURLResponse = URLResponse(url: anyURL(), mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
         
         XCTAssertNotNil(resultErrorFor(data: nil, response: nil, error: nil))
-        XCTAssertNotNil(resultErrorFor(data: nil, response: nil, error: anyNSError()))
         XCTAssertNotNil(resultErrorFor(data: nil, response: anyNonHTTPURLResponse, error: nil))
-        XCTAssertNotNil(resultErrorFor(data: nil, response: anyHTTPURLResponse, error: nil))
         XCTAssertNotNil(resultErrorFor(data: anyData(), response: nil, error: nil))
         
         XCTAssertNotNil(resultErrorFor(data: anyData(), response: anyNonHTTPURLResponse, error: nil))
-        XCTAssertNotNil(resultErrorFor(data: anyData(), response: anyHTTPURLResponse, error: nil))
         XCTAssertNotNil(resultErrorFor(data: nil, response: anyNonHTTPURLResponse, error: anyNSError()))
         XCTAssertNotNil(resultErrorFor(data: nil, response: anyHTTPURLResponse, error: anyNSError()))
         XCTAssertNotNil(resultErrorFor(data: anyData(), response: nil, error: anyNSError()))
@@ -85,12 +83,49 @@ class URLSessionHTTPClientTests: XCTestCase {
         XCTAssertNotNil(resultErrorFor(data: anyData(), response: anyHTTPURLResponse, error: anyNSError()))
     }
     
+    func test_get_successOnEmptyDataWithHTTPURLResponse() {
+        let anyHTTPURLResponse = HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)!
+        let value = resultValuesFor(data: nil, response: anyHTTPURLResponse, error: nil)
+        
+        let emptyData = Data()
+        
+        XCTAssertEqual(value?.data, emptyData)
+        XCTAssertEqual(value?.response.statusCode, anyHTTPURLResponse.statusCode)
+    }
+    
+    func test_get_successOnDataWithHTTPURLResponse() {
+        let anyHTTPURLResponse = HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)!
+        let data = anyData()
+        
+        let value = resultValuesFor(data: data, response: anyHTTPURLResponse, error: nil)
+        
+        XCTAssertEqual(value?.data, data)
+        XCTAssertEqual(value?.response.statusCode, anyHTTPURLResponse.statusCode)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> URLSessionHTTPClient {
         let sut = URLSessionHTTPClient()
         trackForMemoryLeak(sut, file: file, line: line)
         return sut
+    }
+    
+    private func resultValuesFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> (data: Data, response: HTTPURLResponse)? {
+        
+        let result = resultFor(data: data, response: response, error: error, file: file, line: line)
+        switch result {
+        case .failure:
+            XCTFail("Expected success, got \(result) inseted", file: file, line: line)
+            return nil
+        case let .success((data, response)):
+            if let response = response as HTTPURLResponse? {
+                return (data, response)
+            } else {
+                XCTFail("Expected success with HTTPURLResponse, got \(result) inseted", file: file, line: line)
+                return nil
+            }
+        }
     }
     
     private func resultErrorFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> Error? {
@@ -121,14 +156,6 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     private class URLProtocolStub: URLProtocol {
-        static func startInterceptingRequest() {
-            URLProtocol.registerClass(URLProtocolStub.self)
-        }
-        
-        static func stopInterceptingRequest() {
-            URLProtocol.unregisterClass(URLProtocolStub.self)
-            stub = nil
-        }
         
         private struct Stub {
             let data: Data?
@@ -145,6 +172,16 @@ class URLSessionHTTPClientTests: XCTestCase {
         
         static func observeRequest(_ observer: @escaping (URLRequest) -> Void) {
             self.observer = observer
+        }
+        
+        static func startInterceptingRequest() {
+            URLProtocol.registerClass(URLProtocolStub.self)
+        }
+        
+        static func stopInterceptingRequest() {
+            URLProtocol.unregisterClass(URLProtocolStub.self)
+            stub = nil
+            observer = nil
         }
         
         override class func canInit(with request: URLRequest) -> Bool {
