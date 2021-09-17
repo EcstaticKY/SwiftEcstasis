@@ -30,11 +30,19 @@ extension URLSessionTask: HTTPClientTask { }
 
 class URLSessionHTTPClientTests: XCTestCase {
     
+    override func setUp() {
+        super.setUp()
+        URLProtocolStub.startInterceptingRequest()
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+        URLProtocolStub.stopInterceptingRequest()
+    }
+    
     func test_get_failsOnError() {
         let sut = URLSessionHTTPClient()
         let error = NSError(domain: "any error", code: 0)
-        
-        URLProtocol.registerClass(URLProtocolStub.self)
         
         URLProtocolStub.stub(data: nil, response: nil, error: error)
         
@@ -51,14 +59,20 @@ class URLSessionHTTPClientTests: XCTestCase {
         }
         
         wait(for: [exp], timeout: 1.0)
-        
-        URLProtocol.unregisterClass(URLProtocolStub.self)
     }
     
     // MARK: - Helpers
-    private func anyURL() -> URL { URL(string: "https://any-url.com")! }
     
     private class URLProtocolStub: URLProtocol {
+        static func startInterceptingRequest() {
+            URLProtocol.registerClass(URLProtocolStub.self)
+        }
+        
+        static func stopInterceptingRequest() {
+            URLProtocol.unregisterClass(URLProtocolStub.self)
+            stub = nil
+        }
+        
         private struct Stub {
             let data: Data?
             let response: URLResponse?
