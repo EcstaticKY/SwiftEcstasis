@@ -21,11 +21,26 @@ public final class RemoteMessageImageDataLoader {
         case invalidData
     }
     
-    private struct HTTPClientWrappedTask: MessageImageDataLoadTask {
-        let wrapped: HTTPClientTask
+    private class HTTPClientWrappedTask: MessageImageDataLoadTask {
+        var wrapped: HTTPClientTask?
+        private var completion: ((Result) -> Void)?
+        
+        init(completion: @escaping (Result) -> Void) {
+            self.completion = completion
+        }
         
         func cancel() {
-            wrapped.cancel()
+            preventFurtherCompletion()
+            wrapped?.cancel()
+        }
+        
+        func complete(with result: Result) {
+            completion?(result)
+            preventFurtherCompletion()
+        }
+        
+        func preventFurtherCompletion() {
+            completion = nil
         }
     }
     
@@ -33,20 +48,20 @@ public final class RemoteMessageImageDataLoader {
     
     @discardableResult
     public func load(from url: URL, completion: @escaping (Result) -> Void) -> MessageImageDataLoadTask {
-        let task = client.get(from: url) { [weak self] result in
+        
+        let task = HTTPClientWrappedTask(completion: completion)
+        
+        task.wrapped = client.get(from: url) { [weak self] result in
             guard self != nil else { return }
             
-            switch result {
-            case let .success((data, response)):
-                guard data.count > 0 && response.statusCode == 200 else {
-                    return completion(.failure(.invalidData))
-                }
-                completion(.success(data))
-            case .failure:
-                completion(.failure(.connectivity))
-            }
+            task.complete(with: result
+                .mapError { _ in Error.connectivity }
+                .flatMap { (data, response) in
+                    let isValidResponse = !data.isEmpty && response.statusCode == 200
+                    return isValidResponse ? .success(data) : .failure(.invalidData)
+                })
         }
         
-        return HTTPClientWrappedTask(wrapped: task)
+        return task
     }
 }

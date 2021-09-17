@@ -83,28 +83,35 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         XCTAssertTrue(receivedResults.isEmpty, "Expected no result, got \(receivedResults) instead")
     }
     
-    func test_load_doesNotRequestsCancelling() {
-        let (sut, client) = makeSUT()
-        
-        sut.load(from: anyURL()) { _ in }
-        
-        XCTAssertTrue(client.canceledURLs.isEmpty)
-    }
-    
-    func test_load_cancelsTaskOnCancelling() {
+    func test_cancelLoadTask_cancelsClientURLRequest() {
         let (sut, client) = makeSUT()
         let url = anyURL()
         
         let task = sut.load(from: url) { _ in }
+        XCTAssertTrue(client.canceledURLs.isEmpty, "Expected no cancelled url")
+        
+        task.cancel()
+        XCTAssertEqual(client.canceledURLs, [url], "Expected one cancelled url, got \(client.canceledURLs) instead")
+    }
+    
+    func test_cancelLoadTask_doesNotDeliverResult() {
+        let (sut, client) = makeSUT()
+        
+        var receivedResults = [RemoteMessageImageDataLoader.Result]()
+        let task = sut.load(from: anyURL()) { result in receivedResults.append(result) }
         task.cancel()
         
-        XCTAssertEqual(client.canceledURLs, [url])
+        client.completeWithError()
+        client.completeWith(Data(), statusCode: 200)
+        client.completeWith(Data(), statusCode: 199)
+        
+        XCTAssertTrue(receivedResults.isEmpty, "Expected no delivered results, got \(receivedResults) instead")
     }
     
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line)
-    -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
+        -> (sut: RemoteMessageImageDataLoader, client: HTTPClientSpy) {
         
         let client = HTTPClientSpy()
         let sut = RemoteMessageImageDataLoader(client: client)
@@ -157,8 +164,8 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         
         func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
             messages.append((url, completion))
-            return HTTPClientTaskSpy(url: url) { url in
-                self.canceledURLs.append(url)
+            return HTTPClientTaskSpy(url: url) { [weak self] url in
+                self?.canceledURLs.append(url)
             }
         }
         
