@@ -50,6 +50,17 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
         }
     }
     
+    func test_load_failsOnPrimaryErrorWithFallbackError() {
+        let (sut, primary, fallback) = makeSUT()
+        let error = anyNSError()
+        let anotherError = NSError(domain: "another error", code: 0)
+        
+        expect(sut, toCompleteWith: .failure(anotherError)) {
+            primary.completeWithError(error)
+            fallback.completeWithError(anotherError)
+        }
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line)
