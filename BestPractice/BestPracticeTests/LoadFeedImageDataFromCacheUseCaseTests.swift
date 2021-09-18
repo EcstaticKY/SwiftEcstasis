@@ -23,10 +23,14 @@ class LocalMessageImageDataLoader {
         case notFound
     }
     func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) {
-        store.retrieve(with: url) { result in
+        store.retrieve(with: url) { [weak self] result in
+            guard self != nil else { return }
+            
             switch result {
             case .failure: completion(.failure(Error.retrieval))
-            case .success: completion(.failure(Error.notFound))
+            case let .success(data):
+                guard !data.isEmpty else { return completion(.failure(Error.notFound)) }
+                completion(.success(data))
             }
         }
     }
@@ -63,7 +67,7 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
     func test_load_failsOnRetrievalError() {
         let (sut, store) = makeSUT()
         
-        expect(sut, toCompleteWith: .failure(LocalMessageImageDataLoader.Error.retrieval)) {
+        expect(sut, toCompleteWith: failure(.retrieval)) {
             let error = anyNSError()
             store.completeWithError(error)
         }
@@ -72,10 +76,35 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
     func test_load_deliversNotFoundErrorOnEmptyCache() {
         let (sut, store) = makeSUT()
         
-        expect(sut, toCompleteWith: .failure(LocalMessageImageDataLoader.Error.notFound)) {
+        expect(sut, toCompleteWith: failure(.notFound)) {
             let emptyData = Data()
             store.completeWithData(emptyData)
         }
+    }
+    
+    func test_load_deliversFoundImageData() {
+        let (sut, store) = makeSUT()
+        let data = anyData()
+        
+        expect(sut, toCompleteWith: .success(data)) {
+            store.completeWithData(data)
+        }
+    }
+    
+    func test_load_doesNotDeliverResultAfterInstanceHasBeenDeallocated() {
+        let store = MessageImageDataStoreSpy()
+        var sut: LocalMessageImageDataLoader? = LocalMessageImageDataLoader(store: store)
+        
+        var receivedResults = [MessageImageDataLoader.Result]()
+        sut?.load(from: anyURL()) { result in
+            receivedResults.append(result)
+        }
+        
+        sut = nil
+        store.completeWithData(anyData())
+        store.completeWithError(anyNSError())
+        
+        XCTAssertTrue(receivedResults.isEmpty, "Expected no result, got \(receivedResults) instead")
     }
     
     // MARK: - Helpers
@@ -111,6 +140,10 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         action()
         
         wait(for: [exp], timeout: 1.0)
+    }
+    
+    private func failure(_ error: LocalMessageImageDataLoader.Error) -> MessageImageDataLoader.Result {
+        .failure(error)
     }
     
     private class MessageImageDataStoreSpy: MessageImageDataStore {
