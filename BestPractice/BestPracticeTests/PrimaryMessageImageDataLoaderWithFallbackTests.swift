@@ -18,9 +18,11 @@ class PrimaryMessageImageDataLoaderWithFallback: MessageImageDataLoader {
     @discardableResult
     func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) -> MessageImageDataLoadTask {
         
-        primary.load(from: url) { result in
-            if case .success = result {
-                completion(result)
+        primary.load(from: url) { [weak self] result in
+            switch result {
+            case let .success(data): completion(.success(data))
+            case .failure:
+                self?.fallback.load(from: url, completion: completion)
             }
         }
     }
@@ -29,11 +31,22 @@ class PrimaryMessageImageDataLoaderWithFallback: MessageImageDataLoader {
 class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
 
     func test_load_deliversImageDataOnPrimarySuccess() {
-        let data = anyData()
         let (sut, primary, _) = makeSUT()
+        let data = anyData()
         
         expect(sut, toCompleteWith: .success(data)) {
             primary.completeWithData(data)
+        }
+    }
+    
+    func test_load_deliversImageDataOnPrimaryErrorWithFallbackSuccess() {
+        let (sut, primary, fallback) = makeSUT()
+        let data = anyData()
+        let error = anyNSError()
+        
+        expect(sut, toCompleteWith: .success(data)) {
+            primary.completeWithError(error)
+            fallback.completeWithData(data)
         }
     }
     
@@ -90,6 +103,10 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
         
         func completeWithData(_ data: Data, at index: Int = 0) {
             messages[index].completion(.success(data))
+        }
+        
+        func completeWithError(_ error: Error, at index: Int = 0) {
+            messages[index].completion(.failure(error))
         }
     }
 }
