@@ -30,23 +30,46 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
 
     func test_load_deliversImageDataOnPrimarySuccess() {
         let data = anyData()
+        let (sut, primary, _) = makeSUT()
+        
+        expect(sut, toCompleteWith: .success(data)) {
+            primary.completeWithData(data)
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line)
+    -> (sut: PrimaryMessageImageDataLoaderWithFallback, primary: MessageImageDataLoaderSpy, fallback: MessageImageDataLoaderSpy) {
         
         let primary = MessageImageDataLoaderSpy()
         let fallback = MessageImageDataLoaderSpy()
         let sut = PrimaryMessageImageDataLoaderWithFallback(primary: primary, fallback: fallback)
+        trackForMemoryLeak(primary, file: file, line: line)
+        trackForMemoryLeak(fallback, file: file, line: line)
+        trackForMemoryLeak(sut, file: file, line: line)
+        return (sut, primary, fallback)
+    }
+    
+    private func expect(_ sut: PrimaryMessageImageDataLoaderWithFallback,
+                        toCompleteWith expectedResult: MessageImageDataLoader.Result,
+                        when action: () -> Void,
+                        file: StaticString = #filePath, line: UInt = #line) {
         
         let exp = expectation(description: "Wait for load completion")
-        sut.load(from: anyURL()) { result in
-            switch result {
-            case let .success(receivedData):
-                XCTAssertEqual(receivedData, data)
-            case .failure:
-                XCTFail("Expected success data, got \(result) instead.")
+        sut.load(from: anyURL()) { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case let (.success(receivedData), .success(expectedData)):
+                XCTAssertEqual(receivedData, expectedData, "Expected equal image data", file: file, line: line)
+            case let (.failure(receivedError as NSError), .failure(expectedError as NSError)):
+                XCTAssertEqual(receivedError, expectedError, "Expected same error", file: file, line: line)
+            default:
+                XCTFail("Expected \(expectedResult), got \(receivedResult) instead", file: file, line: line)
             }
             exp.fulfill()
         }
         
-        primary.completeWithData(data)
+        action()
         
         wait(for: [exp], timeout: 1.0)
     }
