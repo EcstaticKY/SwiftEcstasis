@@ -38,6 +38,17 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.loadURLs, [url])
     }
     
+    func test_loadTwice_requestsImageDataTwice() {
+        let url = anyURL()
+        let anotherURL = URL(string: "https://another-url.com")!
+        let (sut, store) = makeSUT()
+        
+        sut.load(from: url)
+        sut.load(from: anotherURL)
+        
+        XCTAssertEqual(store.loadURLs, [url, anotherURL])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line)
