@@ -6,33 +6,64 @@
 import XCTest
 import BestPractice
 
-protocol MessageImageDataStore {
-    typealias Result = Swift.Result<Data, Error>
-    func retrieve(with url: URL, completion: @escaping (Result) -> Void)
+protocol MessageImageDataRetrieveTask {
+    func cancel()
 }
 
-class LocalMessageImageDataLoader {
+protocol MessageImageDataStore {
+    typealias Result = Swift.Result<Data, Error>
+    func retrieve(with url: URL, completion: @escaping (Result) -> Void) -> MessageImageDataRetrieveTask
+}
+
+class LocalMessageImageDataLoader: MessageImageDataLoader {
     private let store: MessageImageDataStore
     
     init(store: MessageImageDataStore) {
         self.store = store
     }
     
+    private class MessageImageDataRetrieveTaskWrapper: MessageImageDataLoadTask {
+        private var completion: ((MessageImageDataLoader.Result) -> Void)?
+        var wrapped: MessageImageDataRetrieveTask?
+        
+        init(completion: @escaping (MessageImageDataLoader.Result) -> Void) {
+            self.completion = completion
+        }
+        
+        func cancel() {
+            preventFurtherComplete()
+            wrapped?.cancel()
+        }
+        
+        func complete(with result: MessageImageDataLoader.Result) {
+            completion?(result)
+            preventFurtherComplete()
+        }
+        
+        private func preventFurtherComplete() {
+            completion = nil
+        }
+    }
+    
     enum Error: Swift.Error {
         case retrieval
         case notFound
     }
-    func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) {
-        store.retrieve(with: url) { [weak self] result in
+    
+    @discardableResult
+    func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) -> MessageImageDataLoadTask {
+        
+        let task = MessageImageDataRetrieveTaskWrapper(completion: completion)
+        
+        task.wrapped = store.retrieve(with: url) { [weak self] result in
             guard self != nil else { return }
             
-            switch result {
-            case .failure: completion(.failure(Error.retrieval))
-            case let .success(data):
-                guard !data.isEmpty else { return completion(.failure(Error.notFound)) }
-                completion(.success(data))
-            }
+            task.complete(with: result.mapError { _ in Error.retrieval }.flatMap { data in
+                return data.isEmpty ? .failure(Error.notFound) : .success(data)
+            })
         }
+        
+        return task
     }
 }
 
@@ -62,6 +93,33 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         sut.load(from: anotherURL) { _ in }
         
         XCTAssertEqual(store.loadURLs, [url, anotherURL])
+    }
+    
+    func test_cancelLoadTask_cancelsRetrievingFromStore() {
+        let (sut, store) = makeSUT()
+        let url = anyURL()
+        
+        let task = sut.load(from: url) { _ in }
+        XCTAssertTrue(store.cancelledURLs.isEmpty)
+        
+        task.cancel()
+        XCTAssertEqual(store.cancelledURLs, [url])
+    }
+    
+    func test_cancelLoadTask_doseNotDeliverResult() {
+        let (sut, store) = makeSUT()
+        
+        var retrievedResults = [MessageImageDataStore.Result]()
+        let task = sut.load(from: anyURL()) { result in retrievedResults.append(result) }
+        
+        task.cancel()
+        
+        let emptyData = Data()
+        store.completeWithData(emptyData)
+        store.completeWithData(anyData())
+        store.completeWithError(anyNSError())
+        
+        XCTAssertTrue(retrievedResults.isEmpty, "Expected no result after cancelling load task, got \(retrievedResults) instead")
     }
     
     func test_load_failsOnRetrievalError() {
@@ -152,9 +210,27 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
             messages.map { $0.url }
         }
         private var messages = [(url: URL, completion: (MessageImageDataStore.Result) -> Void)]()
+        var cancelledURLs = [URL]()
         
-        func retrieve(with url: URL, completion: @escaping (MessageImageDataStore.Result) -> Void) {
+        private struct MessageImageDataRetrieveTaskSpy: MessageImageDataRetrieveTask {
+            private let callback: (URL) -> Void
+            private let url: URL
+            
+            init(url: URL, callback: @escaping (URL) -> Void) {
+                self.url = url
+                self.callback = callback
+            }
+            
+            func cancel() {
+                callback(url)
+            }
+        }
+        
+        func retrieve(with url: URL, completion: @escaping (MessageImageDataStore.Result) -> Void) -> MessageImageDataRetrieveTask {
             messages.append((url, completion))
+            return MessageImageDataRetrieveTaskSpy(url: url) { [weak self] url in
+                self?.cancelledURLs.append(url)
+            }
         }
         
         func completeWithError(_ error: Error, at index: Int = 0) {
