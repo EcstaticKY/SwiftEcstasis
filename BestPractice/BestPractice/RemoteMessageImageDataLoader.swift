@@ -5,11 +5,7 @@
 
 import Foundation
 
-public protocol MessageImageDataLoadTask {
-    func cancel()
-}
-
-public final class RemoteMessageImageDataLoader {
+public final class RemoteMessageImageDataLoader: MessageImageDataLoader {
     private let client: HTTPClient
     
     public init(client: HTTPClient) {
@@ -44,7 +40,7 @@ public final class RemoteMessageImageDataLoader {
         }
     }
     
-    public typealias Result = Swift.Result<Data, Error>
+    public typealias Result = MessageImageDataLoader.Result
     
     @discardableResult
     public func load(from url: URL, completion: @escaping (Result) -> Void) -> MessageImageDataLoadTask {
@@ -58,7 +54,7 @@ public final class RemoteMessageImageDataLoader {
                 .mapError { _ in Error.connectivity }
                 .flatMap { (data, response) in
                     let isValidResponse = !data.isEmpty && response.statusCode == 200
-                    return isValidResponse ? .success(data) : .failure(.invalidData)
+                    return isValidResponse ? .success(data) : .failure(Error.invalidData)
                 })
         }
         

@@ -4,9 +4,11 @@
 ///
 
 import XCTest
+import BestPractice
 
 protocol MessageImageDataStore {
-    func retrieve(with url: URL)
+    typealias Result = Swift.Result<Data, Error>
+    func retrieve(with url: URL, completion: @escaping (Result) -> Void)
 }
 
 class LocalMessageImageDataLoader {
@@ -16,8 +18,13 @@ class LocalMessageImageDataLoader {
         self.store = store
     }
     
-    func load(from url: URL) {
-        store.retrieve(with: url)
+    enum Error: Swift.Error {
+        case retrievalError
+    }
+    func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) {
+        store.retrieve(with: url) { _ in
+            completion(.failure(Error.retrievalError))
+        }
     }
 }
 
@@ -33,7 +40,7 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         let url = anyURL()
         let (sut, store) = makeSUT()
         
-        sut.load(from: url)
+        sut.load(from: url) { _ in }
         
         XCTAssertEqual(store.loadURLs, [url])
     }
@@ -43,10 +50,19 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         let anotherURL = URL(string: "https://another-url.com")!
         let (sut, store) = makeSUT()
         
-        sut.load(from: url)
-        sut.load(from: anotherURL)
+        sut.load(from: url) { _ in }
+        sut.load(from: anotherURL) { _ in }
         
         XCTAssertEqual(store.loadURLs, [url, anotherURL])
+    }
+    
+    func test_load_deliversErrorOnRetrievalError() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toCompleteWith: .failure(LocalMessageImageDataLoader.Error.retrievalError)) {
+            let error = anyNSError()
+            store.completeWithError(error)
+        }
     }
     
     // MARK: - Helpers
@@ -61,12 +77,39 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         return (sut, store)
     }
     
+    private func expect(_ sut: LocalMessageImageDataLoader,
+                        toCompleteWith expectedResult: MessageImageDataLoader.Result,
+                        action when: () -> Void,
+                        file: StaticString = #filePath, line: UInt = #line) {
+        
+        let exp = expectation(description: "Wait for load completion")
+        sut.load(from: anyURL()) { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case let (.success(receivedData), .success(expectedData)):
+                XCTAssertEqual(receivedData, expectedData, "Expected equal image data", file: file, line: line)
+            case let (.failure(receivedError as LocalMessageImageDataLoader.Error), .failure(expectedError as LocalMessageImageDataLoader.Error)):
+                XCTAssertEqual(receivedError, expectedError, "Expected same error", file: file, line: line)
+            default:
+                XCTFail("Expected \(expectedResult), got \(receivedResult) instead", file: file, line: line)
+            }
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+    }
+    
     private class MessageImageDataStoreSpy: MessageImageDataStore {
         
-        var loadURLs = [URL]()
+        var loadURLs: [URL] {
+            messages.map { $0.url }
+        }
+        private var messages = [(url: URL, completion: (MessageImageDataStore.Result) -> Void)]()
         
-        func retrieve(with url: URL) {
-            loadURLs.append(url)
+        func retrieve(with url: URL, completion: @escaping (MessageImageDataStore.Result) -> Void) {
+            messages.append((url, completion))
+        }
+        
+        func completeWithError(_ error: Error, at index: Int = 0) {
+            messages[index].completion(.failure(error))
         }
     }
 }

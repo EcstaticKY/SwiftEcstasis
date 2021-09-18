@@ -34,7 +34,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
     func test_load_failsOnClientError() {
         let (sut, client) = makeSUT()
         
-        expect(sut, toCompleteWith: .failure(.connectivity)) {
+        expect(sut, toCompleteWith: .failure(RemoteMessageImageDataLoader.Error.connectivity)) {
             client.completeWithError()
         }
     }
@@ -44,7 +44,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         
         let samples = [199, 201, 250, 300, 404, 500]
         samples.enumerated().forEach { index, statusCode in
-            expect(sut, toCompleteWith: .failure(.invalidData)) {
+            expect(sut, toCompleteWith: .failure(RemoteMessageImageDataLoader.Error.invalidData)) {
                 client.completeWith(anyData(), statusCode: statusCode, at: index)
             }
         }
@@ -54,7 +54,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
         let (sut, client) = makeSUT()
         let emptyData = Data()
         
-        expect(sut, toCompleteWith: .failure(.invalidData)) {
+        expect(sut, toCompleteWith: .failure(RemoteMessageImageDataLoader.Error.invalidData)) {
             client.completeWith(emptyData, statusCode: 200)
         }
     }
@@ -132,7 +132,7 @@ class LoadMessageImageDataFromRemoteUseCaseTests: XCTestCase {
             switch (receivedResult, expectedResult) {
             case let (.success(receivedData), .success(expectedData)):
                 XCTAssertEqual(receivedData, expectedData, file: file, line: line)
-            case let (.failure(receivedError), .failure(expectedError)):
+            case let (.failure(receivedError as RemoteMessageImageDataLoader.Error), .failure(expectedError as RemoteMessageImageDataLoader.Error)):
                 XCTAssertEqual(receivedError, expectedError, file: file, line: line)
             default:
                 XCTFail("Expected \(expectedResult), got \(receivedResult) instead.", file: file, line: line)

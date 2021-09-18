@@ -15,6 +15,7 @@
 		38741C1B26F43CDB008229A1 /* XCTestCase+sharedTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38741C1A26F43CDB008229A1 /* XCTestCase+sharedTestHelpers.swift */; };
 		38741C1D26F44016008229A1 /* XCTestCase+TrackForMemoryLeak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38741C1C26F44016008229A1 /* XCTestCase+TrackForMemoryLeak.swift */; };
 		38741C1F26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38741C1E26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift */; };
+		38741C2126F5930D008229A1 /* MessageImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38741C2026F5930D008229A1 /* MessageImageDataLoader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +40,7 @@
 		38741C1A26F43CDB008229A1 /* XCTestCase+sharedTestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+sharedTestHelpers.swift"; sourceTree = "<group>"; };
 		38741C1C26F44016008229A1 /* XCTestCase+TrackForMemoryLeak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+TrackForMemoryLeak.swift"; sourceTree = "<group>"; };
 		38741C1E26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadFeedImageDataFromCacheUseCaseTests.swift; sourceTree = "<group>"; };
+		38741C2026F5930D008229A1 /* MessageImageDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageImageDataLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 				3863CB9326F3098B00D023B6 /* Info.plist */,
 				3863CBAB26F322B400D023B6 /* HTTPClient.swift */,
 				3863CBAD26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift */,
+				38741C2026F5930D008229A1 /* MessageImageDataLoader.swift */,
 			);
 			path = BestPractice;
 			sourceTree = "<group>";
@@ -220,6 +223,7 @@
 			files = (
 				3863CBAE26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift in Sources */,
 				3863CBAC26F322B400D023B6 /* HTTPClient.swift in Sources */,
+				38741C2126F5930D008229A1 /* MessageImageDataLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
