@@ -19,11 +19,15 @@ class LocalMessageImageDataLoader {
     }
     
     enum Error: Swift.Error {
-        case retrievalError
+        case retrieval
+        case notFound
     }
     func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) {
-        store.retrieve(with: url) { _ in
-            completion(.failure(Error.retrievalError))
+        store.retrieve(with: url) { result in
+            switch result {
+            case .failure: completion(.failure(Error.retrieval))
+            case .success: completion(.failure(Error.notFound))
+            }
         }
     }
 }
@@ -56,12 +60,21 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.loadURLs, [url, anotherURL])
     }
     
-    func test_load_deliversErrorOnRetrievalError() {
+    func test_load_failsOnRetrievalError() {
         let (sut, store) = makeSUT()
         
-        expect(sut, toCompleteWith: .failure(LocalMessageImageDataLoader.Error.retrievalError)) {
+        expect(sut, toCompleteWith: .failure(LocalMessageImageDataLoader.Error.retrieval)) {
             let error = anyNSError()
             store.completeWithError(error)
+        }
+    }
+    
+    func test_load_deliversNotFoundErrorOnEmptyCache() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toCompleteWith: .failure(LocalMessageImageDataLoader.Error.notFound)) {
+            let emptyData = Data()
+            store.completeWithData(emptyData)
         }
     }
     
@@ -79,7 +92,7 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
     
     private func expect(_ sut: LocalMessageImageDataLoader,
                         toCompleteWith expectedResult: MessageImageDataLoader.Result,
-                        action when: () -> Void,
+                        when action: () -> Void,
                         file: StaticString = #filePath, line: UInt = #line) {
         
         let exp = expectation(description: "Wait for load completion")
@@ -94,6 +107,9 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
             }
             exp.fulfill()
         }
+        
+        action()
+        
         wait(for: [exp], timeout: 1.0)
     }
     
@@ -110,6 +126,10 @@ class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
         
         func completeWithError(_ error: Error, at index: Int = 0) {
             messages[index].completion(.failure(error))
+        }
+        
+        func completeWithData(_ data: Data, at index: Int = 0) {
+            messages[index].completion(.success(data))
         }
     }
 }
