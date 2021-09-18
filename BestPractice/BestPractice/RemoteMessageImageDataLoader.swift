@@ -21,7 +21,7 @@ public final class RemoteMessageImageDataLoader {
         case invalidData
     }
     
-    private class HTTPClientWrappedTask: MessageImageDataLoadTask {
+    private class HTTPClientTaskWrapper: MessageImageDataLoadTask {
         var wrapped: HTTPClientTask?
         private var completion: ((Result) -> Void)?
         
@@ -49,7 +49,7 @@ public final class RemoteMessageImageDataLoader {
     @discardableResult
     public func load(from url: URL, completion: @escaping (Result) -> Void) -> MessageImageDataLoadTask {
         
-        let task = HTTPClientWrappedTask(completion: completion)
+        let task = HTTPClientTaskWrapper(completion: completion)
         
         task.wrapped = client.get(from: url) { [weak self] result in
             guard self != nil else { return }
