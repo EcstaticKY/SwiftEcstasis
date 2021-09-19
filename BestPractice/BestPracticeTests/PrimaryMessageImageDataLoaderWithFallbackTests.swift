@@ -30,44 +30,37 @@ class PrimaryMessageImageDataLoaderWithFallback: MessageImageDataLoader {
 
 class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
 
-    func test_load_deliversImageDataOnPrimarySuccess() {
-        let (sut, primary, _) = makeSUT()
-        let data = anyData()
+    func test_load_deliversPrimayImageDataOnPrimarySuccess() {
+        let primaryData = Data("primary".utf8)
+        let fallbackData = Data("fallback".utf8)
+        let (sut, _, _) = makeSUT(primaryResult: .success(primaryData), fallbackResult: .success(fallbackData))
         
-        expect(sut, toCompleteWith: .success(data)) {
-            primary.completeWithData(data)
-        }
+        expect(sut, toCompleteWith: .success(primaryData))
     }
     
-    func test_load_deliversImageDataOnPrimaryErrorWithFallbackSuccess() {
-        let (sut, primary, fallback) = makeSUT()
-        let data = anyData()
-        let error = anyNSError()
+    func test_load_deliversFallbackImageDataOnPrimaryFailure() {
+        let primaryError = anyNSError()
+        let fallbackData = anyData()
+        let (sut, _, _) = makeSUT(primaryResult: .failure(primaryError), fallbackResult: .success(fallbackData))
         
-        expect(sut, toCompleteWith: .success(data)) {
-            primary.completeWithError(error)
-            fallback.completeWithData(data)
-        }
+        expect(sut, toCompleteWith: .success(fallbackData))
     }
     
     func test_load_failsOnPrimaryErrorWithFallbackError() {
-        let (sut, primary, fallback) = makeSUT()
-        let error = anyNSError()
-        let anotherError = NSError(domain: "another error", code: 0)
+        let primaryError = NSError(domain: "primary error", code: 0)
+        let fallbackError = NSError(domain: "fallback error", code: 0)
+        let (sut, _, _) = makeSUT(primaryResult: .failure(primaryError), fallbackResult: .failure(fallbackError))
         
-        expect(sut, toCompleteWith: .failure(anotherError)) {
-            primary.completeWithError(error)
-            fallback.completeWithError(anotherError)
-        }
+        expect(sut, toCompleteWith: .failure(fallbackError))
     }
     
     // MARK: - Helpers
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line)
-    -> (sut: PrimaryMessageImageDataLoaderWithFallback, primary: MessageImageDataLoaderSpy, fallback: MessageImageDataLoaderSpy) {
+    private func makeSUT(primaryResult: MessageImageDataLoader.Result, fallbackResult: MessageImageDataLoader.Result, file: StaticString = #filePath, line: UInt = #line)
+    -> (sut: PrimaryMessageImageDataLoaderWithFallback, primary: MessageImageDataLoaderStub, fallback: MessageImageDataLoaderStub) {
         
-        let primary = MessageImageDataLoaderSpy()
-        let fallback = MessageImageDataLoaderSpy()
+        let primary = MessageImageDataLoaderStub(result: primaryResult)
+        let fallback = MessageImageDataLoaderStub(result: fallbackResult)
         let sut = PrimaryMessageImageDataLoaderWithFallback(primary: primary, fallback: fallback)
         trackForMemoryLeak(primary, file: file, line: line)
         trackForMemoryLeak(fallback, file: file, line: line)
@@ -77,7 +70,6 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
     
     private func expect(_ sut: PrimaryMessageImageDataLoaderWithFallback,
                         toCompleteWith expectedResult: MessageImageDataLoader.Result,
-                        when action: () -> Void,
                         file: StaticString = #filePath, line: UInt = #line) {
         
         let exp = expectation(description: "Wait for load completion")
@@ -93,14 +85,16 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
             exp.fulfill()
         }
         
-        action()
-        
         wait(for: [exp], timeout: 1.0)
     }
     
-    private class MessageImageDataLoaderSpy: MessageImageDataLoader {
+    private class MessageImageDataLoaderStub: MessageImageDataLoader {
         
-        private var messages = [(url: URL, completion: (MessageImageDataLoader.Result) -> Void)]()
+        private let result: MessageImageDataLoader.Result
+        
+        init(result: MessageImageDataLoader.Result) {
+            self.result = result
+        }
         
         private class MessageImageDataLoadTaskSpy: MessageImageDataLoadTask {
             func cancel() { }
@@ -108,16 +102,8 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
         
         func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) -> MessageImageDataLoadTask {
             
-            messages.append((url, completion))
+            completion(result)
             return MessageImageDataLoadTaskSpy()
-        }
-        
-        func completeWithData(_ data: Data, at index: Int = 0) {
-            messages[index].completion(.success(data))
-        }
-        
-        func completeWithError(_ error: Error, at index: Int = 0) {
-            messages[index].completion(.failure(error))
         }
     }
 }
