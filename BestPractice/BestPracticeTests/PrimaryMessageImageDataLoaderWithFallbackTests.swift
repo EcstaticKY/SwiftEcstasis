@@ -6,7 +6,7 @@
 import XCTest
 import BestPractice
 
-class PrimaryMessageImageDataLoaderWithFallback: MessageImageDataLoader {
+class MessageImageDataLoaderWithFallbackComposite: MessageImageDataLoader {
     private let primary: MessageImageDataLoader
     private let fallback: MessageImageDataLoader
     
@@ -57,18 +57,18 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
     // MARK: - Helpers
     
     private func makeSUT(primaryResult: MessageImageDataLoader.Result, fallbackResult: MessageImageDataLoader.Result, file: StaticString = #filePath, line: UInt = #line)
-    -> (sut: PrimaryMessageImageDataLoaderWithFallback, primary: MessageImageDataLoaderStub, fallback: MessageImageDataLoaderStub) {
+    -> (sut: MessageImageDataLoaderWithFallbackComposite, primary: MessageImageDataLoaderStub, fallback: MessageImageDataLoaderStub) {
         
         let primary = MessageImageDataLoaderStub(result: primaryResult)
         let fallback = MessageImageDataLoaderStub(result: fallbackResult)
-        let sut = PrimaryMessageImageDataLoaderWithFallback(primary: primary, fallback: fallback)
+        let sut = MessageImageDataLoaderWithFallbackComposite(primary: primary, fallback: fallback)
         trackForMemoryLeak(primary, file: file, line: line)
         trackForMemoryLeak(fallback, file: file, line: line)
         trackForMemoryLeak(sut, file: file, line: line)
         return (sut, primary, fallback)
     }
     
-    private func expect(_ sut: PrimaryMessageImageDataLoaderWithFallback,
+    private func expect(_ sut: MessageImageDataLoaderWithFallbackComposite,
                         toCompleteWith expectedResult: MessageImageDataLoader.Result,
                         file: StaticString = #filePath, line: UInt = #line) {
         
