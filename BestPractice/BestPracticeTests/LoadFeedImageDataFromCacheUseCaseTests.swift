@@ -6,8 +6,6 @@
 import XCTest
 import BestPractice
 
-
-
 class LoadMessageImageDataFromCacheUseCaseTests: XCTestCase {
 
     func test_init_doesNotRequestImageData() {

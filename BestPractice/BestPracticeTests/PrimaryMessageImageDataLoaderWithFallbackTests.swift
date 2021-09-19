@@ -15,16 +15,27 @@ class MessageImageDataLoaderWithFallbackComposite: MessageImageDataLoader {
         self.fallback = fallback
     }
     
+    private class MessageImageDataLoadTaskWrapper: MessageImageDataLoadTask {
+        var wrapped: MessageImageDataLoadTask?
+        
+        func cancel() {
+            wrapped?.cancel()
+        }
+    }
+    
     @discardableResult
     func load(from url: URL, completion: @escaping (MessageImageDataLoader.Result) -> Void) -> MessageImageDataLoadTask {
         
-        primary.load(from: url) { [weak self] result in
+        let task = MessageImageDataLoadTaskWrapper()
+        task.wrapped = primary.load(from: url) { [weak self] result in
             switch result {
             case .success: completion(result)
             case .failure:
-                self?.fallback.load(from: url, completion: completion)
+                task.wrapped = self?.fallback.load(from: url, completion: completion)
             }
         }
+        
+        return task
     }
 }
 
@@ -79,6 +90,27 @@ class PrimaryMessageImageDataLoaderWithFallbackTests: XCTestCase {
         
         XCTAssertEqual(primary.cancelledURLs, [url])
         XCTAssertTrue(fallback.cancelledURLs.isEmpty)
+        XCTAssertTrue(receivedResults.isEmpty, "Expected no result after cancelling, got \(receivedResults) instead")
+    }
+    
+    func test_cancelLoadTask_cancelsFallbackLoadAfterPrimaryLoadingCompletedWithError() {
+        let primaryError = anyNSError()
+        let fallbackData = anyData()
+        let (sut, primary, fallback) = makeSUT(primaryResult: .failure(primaryError), fallbackResult: .success(fallbackData))
+        let url = anyURL()
+        
+        var receivedResults = [MessageImageDataLoader.Result]()
+        let task = sut.load(from: url) { result in
+            receivedResults.append(result)
+        }
+        
+        primary.complete()
+        
+        task.cancel()
+        fallback.complete()
+        
+        XCTAssertEqual(primary.cancelledURLs, [])
+        XCTAssertEqual(fallback.cancelledURLs, [url])
         XCTAssertTrue(receivedResults.isEmpty, "Expected no result after cancelling, got \(receivedResults) instead")
     }
     
