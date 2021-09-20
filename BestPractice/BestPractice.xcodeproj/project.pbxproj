@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38105E1226F8166E00A36641 /* CacheFeedUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E1126F8166E00A36641 /* CacheFeedUseCaseTests.swift */; };
+		38105E1526F8254700A36641 /* LocalFeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E1426F8254700A36641 /* LocalFeedLoader.swift */; };
+		38105E1726F8256F00A36641 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E1626F8256F00A36641 /* FeedItem.swift */; };
+		38105E1926F825A500A36641 /* FeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E1826F825A500A36641 /* FeedStore.swift */; };
 		3847FDE026F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3847FDDF26F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift */; };
 		3847FDE226F62C870033DB78 /* MessageImageDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3847FDE126F62C870033DB78 /* MessageImageDataStore.swift */; };
 		3847FDE426F62CC20033DB78 /* LocalMessageImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3847FDE326F62CC20033DB78 /* LocalMessageImageDataLoader.swift */; };
@@ -32,6 +36,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		38105E1126F8166E00A36641 /* CacheFeedUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFeedUseCaseTests.swift; sourceTree = "<group>"; };
+		38105E1426F8254700A36641 /* LocalFeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFeedLoader.swift; sourceTree = "<group>"; };
+		38105E1626F8256F00A36641 /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
+		38105E1826F825A500A36641 /* FeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStore.swift; sourceTree = "<group>"; };
 		3847FDDF26F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryMessageImageDataLoaderWithFallbackTests.swift; sourceTree = "<group>"; };
 		3847FDE126F62C870033DB78 /* MessageImageDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageImageDataStore.swift; sourceTree = "<group>"; };
 		3847FDE326F62CC20033DB78 /* LocalMessageImageDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalMessageImageDataLoader.swift; sourceTree = "<group>"; };
@@ -68,6 +76,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		38105E1326F8253600A36641 /* Feed Cache */ = {
+			isa = PBXGroup;
+			children = (
+				38105E1426F8254700A36641 /* LocalFeedLoader.swift */,
+				38105E1826F825A500A36641 /* FeedStore.swift */,
+			);
+			path = "Feed Cache";
+			sourceTree = "<group>";
+		};
 		3863CB8526F3098B00D023B6 = {
 			isa = PBXGroup;
 			children = (
@@ -89,12 +106,14 @@
 		3863CB9126F3098B00D023B6 /* BestPractice */ = {
 			isa = PBXGroup;
 			children = (
+				38105E1326F8253600A36641 /* Feed Cache */,
 				3863CB9326F3098B00D023B6 /* Info.plist */,
 				3863CBAB26F322B400D023B6 /* HTTPClient.swift */,
 				3863CBAD26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift */,
 				38741C2026F5930D008229A1 /* MessageImageDataLoader.swift */,
 				3847FDE126F62C870033DB78 /* MessageImageDataStore.swift */,
 				3847FDE326F62CC20033DB78 /* LocalMessageImageDataLoader.swift */,
+				38105E1626F8256F00A36641 /* FeedItem.swift */,
 			);
 			path = BestPractice;
 			sourceTree = "<group>";
@@ -107,6 +126,7 @@
 				3863CBA926F321B100D023B6 /* LoadMessageImageDataFromRemoteUseCaseTests.swift */,
 				38741C1726F433C2008229A1 /* URLSessionHTTPClientTests.swift */,
 				38741C1E26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift */,
+				38105E1126F8166E00A36641 /* CacheFeedUseCaseTests.swift */,
 				3847FDDF26F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift */,
 			);
 			path = BestPracticeTests;
@@ -230,10 +250,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38105E1526F8254700A36641 /* LocalFeedLoader.swift in Sources */,
 				3863CBAE26F368AB00D023B6 /* RemoteMessageImageDataLoader.swift in Sources */,
 				3847FDE426F62CC20033DB78 /* LocalMessageImageDataLoader.swift in Sources */,
+				38105E1926F825A500A36641 /* FeedStore.swift in Sources */,
 				3847FDE226F62C870033DB78 /* MessageImageDataStore.swift in Sources */,
 				3863CBAC26F322B400D023B6 /* HTTPClient.swift in Sources */,
+				38105E1726F8256F00A36641 /* FeedItem.swift in Sources */,
 				38741C2126F5930D008229A1 /* MessageImageDataLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -248,6 +271,7 @@
 				38741C1D26F44016008229A1 /* XCTestCase+TrackForMemoryLeak.swift in Sources */,
 				38741C1B26F43CDB008229A1 /* XCTestCase+sharedTestHelpers.swift in Sources */,
 				38741C1F26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift in Sources */,
+				38105E1226F8166E00A36641 /* CacheFeedUseCaseTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
