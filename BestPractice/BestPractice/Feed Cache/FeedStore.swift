@@ -14,6 +14,10 @@ public struct LocalFeedImage: Equatable {
 }
 
 public protocol FeedStore {
+    
     func deleteCache(completion: @escaping (Error?) -> Void)
+    
     func insert(_ localFeed: [LocalFeedImage], timestamp: Date, completion: @escaping (Error?) -> Void)
+    
+    func retrieve(completion: @escaping (Result<(localFeed: [LocalFeedImage], timestamp: Date), Error>) -> Void)
 }

@@ -14,6 +14,29 @@ public class LocalFeedLoader {
         self.currentDate = currentDate
     }
     
+    public enum LoadError: Swift.Error {
+        case retrieval
+        case notFound
+    }
+    
+    public func load(completion: @escaping (FeedLoader.Result) -> Void) {
+        store.retrieve { [unowned self] result in
+            switch result {
+            case .failure: completion(.failure(LoadError.retrieval))
+            case let .success((locals, timestamp)):
+                guard !locals.isEmpty else { return completion(.failure(LoadError.notFound)) }
+                
+                let expiredDate = Calendar(identifier: .gregorian).date(byAdding: .day, value: -7, to: self.currentDate())!
+                
+                if expiredDate >= timestamp {
+                    completion(.failure(LoadError.notFound))
+                } else {
+                    completion(.success(locals.toModels()))
+                }
+            }
+        }
+    }
+    
     public typealias SaveResult = Error?
     public func save(_ feed: [FeedImage], completion: @escaping (SaveResult) -> Void) {
         store.deleteCache { [weak self] error in
@@ -37,12 +60,12 @@ public class LocalFeedLoader {
 
 private extension Array where Element == FeedImage {
     func toLocal() -> [LocalFeedImage] {
-        map { $0.toLocal() }
+        map { LocalFeedImage(uuid: $0.uuid) }
     }
 }
 
-private extension FeedImage {
-    func toLocal() -> LocalFeedImage {
-        LocalFeedImage(uuid: uuid)
+private extension Array where Element == LocalFeedImage {
+    func toModels() -> [FeedImage] {
+        map { FeedImage(uuid: $0.uuid) }
     }
 }

@@ -136,43 +136,4 @@ class CacheFeedUseCaseTests: XCTestCase {
 
         wait(for: [exp], timeout: 1.0)
     }
-    
-    private class FeedStoreSpy: FeedStore {
-        
-        enum Message: Equatable {
-            case deleteCache
-            case insert(models: [LocalFeedImage], timestamp: Date)
-        }
-            
-        var messages = [Message]()
-        private var deleteCompletions = [(Error?) -> Void]()
-        private var insertCompletions = [(Error?) -> Void]()
-        
-        func deleteCache(completion: @escaping (Error?) -> Void) {
-            messages.append(.deleteCache)
-            deleteCompletions.append(completion)
-        }
-        
-        func completeDeletionWith(_ error: Error, at index: Int = 0) {
-            deleteCompletions[index](error)
-        }
-        
-        func completeDeletionSuccessfully(at index: Int = 0) {
-            deleteCompletions[index](nil)
-        }
-        
-        func insert(_ localFeed: [LocalFeedImage], timestamp: Date, completion: @escaping (Error?) -> Void) {
-            messages.append(.insert(models: localFeed, timestamp: timestamp))
-            insertCompletions.append(completion)
-        }
-        
-        func completeInsertionWith(_ error: Error, at index: Int = 0) {
-            insertCompletions[index](error)
-        }
-        
-        func completeInsertionSuccessfully(at index: Int = 0) {
-            insertCompletions[index](nil)
-        }
-    }
-
 }
