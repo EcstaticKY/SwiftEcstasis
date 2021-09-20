@@ -15,34 +15,34 @@ public class LocalFeedLoader {
     }
     
     public typealias SaveResult = Error?
-    public func save(_ items: [FeedItem], completion: @escaping (SaveResult) -> Void) {
+    public func save(_ feed: [FeedImage], completion: @escaping (SaveResult) -> Void) {
         store.deleteCache { [weak self] error in
             guard let self = self else { return }
             if let error = error {
                 completion(error)
             } else {
-                self.cache(items, completion: completion)
+                self.cache(feed, completion: completion)
             }
         }
     }
     
-    private func cache(_ items: [FeedItem], completion: @escaping (SaveResult) -> Void) {
-        let localItems = items.toLocal()
-        self.store.insert(localItems, timestamp: currentDate()) { [weak self] error in
+    private func cache(_ feed: [FeedImage], completion: @escaping (SaveResult) -> Void) {
+        let locals = feed.toLocal()
+        self.store.insert(locals, timestamp: currentDate()) { [weak self] error in
             guard self != nil else { return }
             completion(error)
         }
     }
 }
 
-private extension Array where Element == FeedItem {
-    func toLocal() -> [LocalFeedItem] {
+private extension Array where Element == FeedImage {
+    func toLocal() -> [LocalFeedImage] {
         map { $0.toLocal() }
     }
 }
 
-private extension FeedItem {
-    func toLocal() -> LocalFeedItem {
-        LocalFeedItem(uuid: uuid)
+private extension FeedImage {
+    func toLocal() -> LocalFeedImage {
+        LocalFeedImage(uuid: uuid)
     }
 }

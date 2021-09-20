@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct FeedItem: Equatable {
+public struct FeedImage: Equatable {
     public init(uuid: UUID) {
         self.uuid = uuid
     }

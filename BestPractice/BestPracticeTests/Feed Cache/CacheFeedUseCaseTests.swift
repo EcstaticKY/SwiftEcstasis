@@ -17,7 +17,7 @@ class CacheFeedUseCaseTests: XCTestCase {
     func test_save_doesNotRequestInsertingCacheOnDeletingError() {
         let (sut, store) = makeSUT()
         
-        sut.save([uniqueItem(), uniqueItem()]) { _ in }
+        sut.save(uniqueFeed().models) { _ in }
         XCTAssertEqual(store.messages, [.deleteCache])
         
         store.completeDeletionWith(anyNSError())
@@ -27,12 +27,12 @@ class CacheFeedUseCaseTests: XCTestCase {
     func test_save_requestsInsertingCacheOnSuccessfulDeletion() {
         let timestamp = Date()
         let (sut, store) = makeSUT { timestamp }
-        let items = items()
+        let feed = uniqueFeed()
         
-        sut.save(items.items) { _ in }
+        sut.save(feed.models) { _ in }
         store.completeDeletionSuccessfully()
         
-        XCTAssertEqual(store.messages, [.deleteCache, .insert(items: items.local, timestamp: timestamp)])
+        XCTAssertEqual(store.messages, [.deleteCache, .insert(models: feed.locals, timestamp: timestamp)])
     }
     
     func test_save_failsOnDeletingError() {
@@ -68,7 +68,7 @@ class CacheFeedUseCaseTests: XCTestCase {
         var sut: LocalFeedLoader? = LocalFeedLoader(store: store, currentDate: Date.init)
         
         var receivedErrors = [Error?]()
-        sut?.save([uniqueItem(), uniqueItem()], completion: { error in
+        sut?.save(uniqueFeed().models, completion: { error in
             receivedErrors.append(error)
         })
         
@@ -84,7 +84,7 @@ class CacheFeedUseCaseTests: XCTestCase {
         var sut: LocalFeedLoader? = LocalFeedLoader(store: store, currentDate: Date.init)
         
         var receivedErrors = [Error?]()
-        sut?.save([uniqueItem(), uniqueItem()], completion: { error in
+        sut?.save(uniqueFeed().models, completion: { error in
             receivedErrors.append(error)
         })
         
@@ -108,15 +108,15 @@ class CacheFeedUseCaseTests: XCTestCase {
         return (sut, store)
     }
     
-    private func items() -> (items: [FeedItem], local: [LocalFeedItem]) {
-        let items = [uniqueItem(), uniqueItem()]
-        let local = items.map { LocalFeedItem(uuid: $0.uuid) }
+    private func uniqueFeed() -> (models: [FeedImage], locals: [LocalFeedImage]) {
+        func uniqueItem() -> FeedImage {
+            FeedImage(uuid: UUID())
+        }
         
-        return (items, local)
-    }
-    
-    private func uniqueItem() -> FeedItem {
-        FeedItem(uuid: UUID())
+        let models = [uniqueItem(), uniqueItem()]
+        let locals = models.map { LocalFeedImage(uuid: $0.uuid) }
+        
+        return (models, locals)
     }
     
     private func expect(_ sut: LocalFeedLoader,
@@ -124,10 +124,10 @@ class CacheFeedUseCaseTests: XCTestCase {
                         when action: () -> Void,
                         file: StaticString = #filePath, line: UInt = #line) {
 
-        let items = [uniqueItem(), uniqueItem()]
+        let feed = uniqueFeed()
         
         let exp = expectation(description: "Wait for load completion")
-        sut.save(items) { error in
+        sut.save(feed.models) { error in
             XCTAssertEqual(error as NSError?, expectedError as NSError?)
             exp.fulfill()
         }
@@ -141,7 +141,7 @@ class CacheFeedUseCaseTests: XCTestCase {
         
         enum Message: Equatable {
             case deleteCache
-            case insert(items: [LocalFeedItem], timestamp: Date)
+            case insert(models: [LocalFeedImage], timestamp: Date)
         }
             
         var messages = [Message]()
@@ -161,8 +161,8 @@ class CacheFeedUseCaseTests: XCTestCase {
             deleteCompletions[index](nil)
         }
         
-        func insert(_ items: [LocalFeedItem], timestamp: Date, completion: @escaping (Error?) -> Void) {
-            messages.append(.insert(items: items, timestamp: timestamp))
+        func insert(_ localFeed: [LocalFeedImage], timestamp: Date, completion: @escaping (Error?) -> Void) {
+            messages.append(.insert(models: localFeed, timestamp: timestamp))
             insertCompletions.append(completion)
         }
         

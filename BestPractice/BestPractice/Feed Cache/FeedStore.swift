@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct LocalFeedItem: Equatable {
+public struct LocalFeedImage: Equatable {
     public init(uuid: UUID) {
         self.uuid = uuid
     }
@@ -15,5 +15,5 @@ public struct LocalFeedItem: Equatable {
 
 public protocol FeedStore {
     func deleteCache(completion: @escaping (Error?) -> Void)
-    func insert(_ items: [LocalFeedItem], timestamp: Date, completion: @escaping (Error?) -> Void)
+    func insert(_ localFeed: [LocalFeedImage], timestamp: Date, completion: @escaping (Error?) -> Void)
 }
