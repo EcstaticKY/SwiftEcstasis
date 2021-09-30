@@ -28,4 +28,21 @@ class CombineTests: XCTestCase {
             XCTAssertEqual(receivedValue, "some")
         }
     }
+    
+    func test_combinePublisherType() {
+        let x = PassthroughSubject<String, Never>()
+            .flatMap { name in
+                return Future<String, Error> { promise in
+                    promise(.success(""))
+                    }.catch { _ in
+                        Just("No user found")
+                    }.map { result in
+                        return "\(result) foo"
+                }
+        }
+        
+        print(type(of: x))
+        
+        print(type(of: x.eraseToAnyPublisher()))
+    }
 }
