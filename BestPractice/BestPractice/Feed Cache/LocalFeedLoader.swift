@@ -20,6 +20,7 @@ public class LocalFeedLoader {
     }
     
     public func load(completion: @escaping (FeedLoader.Result) -> Void) {
+        
         store.retrieve { [unowned self] result in
             switch result {
             case .failure: completion(.failure(LoadError.retrieval))

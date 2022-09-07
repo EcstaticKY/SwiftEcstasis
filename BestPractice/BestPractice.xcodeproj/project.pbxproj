@@ -14,9 +14,15 @@
 		38105E1C26F834CA00A36641 /* LoadFeedFromCacheUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E1B26F834CA00A36641 /* LoadFeedFromCacheUseCaseTests.swift */; };
 		38105E1F26F8643C00A36641 /* FeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E1E26F8643C00A36641 /* FeedLoader.swift */; };
 		38105E2226F86B1A00A36641 /* FeedStoreSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38105E2126F86B1A00A36641 /* FeedStoreSpy.swift */; };
+		38229F392706728800335166 /* Date-iso8601Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38229F382706728800335166 /* Date-iso8601Tests.swift */; };
+		38387496270AAD0C0033B4F6 /* GCDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38387495270AAD0C0033B4F6 /* GCDTests.swift */; };
 		3847FDE026F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3847FDDF26F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift */; };
 		3847FDE226F62C870033DB78 /* MessageImageDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3847FDE126F62C870033DB78 /* MessageImageDataStore.swift */; };
 		3847FDE426F62CC20033DB78 /* LocalMessageImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3847FDE326F62CC20033DB78 /* LocalMessageImageDataLoader.swift */; };
+		3858F996272A94C60066B0F0 /* HhhTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3858F995272A94C60066B0F0 /* HhhTests.swift */; };
+		3858F9A5272B90E30066B0F0 /* CleanOC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3858F99C272B90E20066B0F0 /* CleanOC.framework */; };
+		3858F9AA272B90E30066B0F0 /* CleanOCTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3858F9A9272B90E30066B0F0 /* CleanOCTests.m */; };
+		3858F9AC272B90E30066B0F0 /* CleanOC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3858F99E272B90E20066B0F0 /* CleanOC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3863CB9926F3098B00D023B6 /* BestPractice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3863CB8F26F3098B00D023B6 /* BestPractice.framework */; };
 		3863CBAA26F321B100D023B6 /* LoadMessageImageDataFromRemoteUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3863CBA926F321B100D023B6 /* LoadMessageImageDataFromRemoteUseCaseTests.swift */; };
 		3863CBAC26F322B400D023B6 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3863CBAB26F322B400D023B6 /* HTTPClient.swift */; };
@@ -30,6 +36,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3858F9A6272B90E30066B0F0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3863CB8626F3098B00D023B6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3858F99B272B90E20066B0F0;
+			remoteInfo = CleanOC;
+		};
 		3863CB9A26F3098B00D023B6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3863CB8626F3098B00D023B6 /* Project object */;
@@ -47,9 +60,18 @@
 		38105E1B26F834CA00A36641 /* LoadFeedFromCacheUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadFeedFromCacheUseCaseTests.swift; sourceTree = "<group>"; };
 		38105E1E26F8643C00A36641 /* FeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedLoader.swift; sourceTree = "<group>"; };
 		38105E2126F86B1A00A36641 /* FeedStoreSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStoreSpy.swift; sourceTree = "<group>"; };
+		38229F382706728800335166 /* Date-iso8601Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date-iso8601Tests.swift"; sourceTree = "<group>"; };
+		38387495270AAD0C0033B4F6 /* GCDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDTests.swift; sourceTree = "<group>"; };
 		3847FDDF26F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryMessageImageDataLoaderWithFallbackTests.swift; sourceTree = "<group>"; };
 		3847FDE126F62C870033DB78 /* MessageImageDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageImageDataStore.swift; sourceTree = "<group>"; };
 		3847FDE326F62CC20033DB78 /* LocalMessageImageDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalMessageImageDataLoader.swift; sourceTree = "<group>"; };
+		3858F995272A94C60066B0F0 /* HhhTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HhhTests.swift; sourceTree = "<group>"; };
+		3858F99C272B90E20066B0F0 /* CleanOC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleanOC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3858F99E272B90E20066B0F0 /* CleanOC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleanOC.h; sourceTree = "<group>"; };
+		3858F99F272B90E20066B0F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3858F9A4272B90E30066B0F0 /* CleanOCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleanOCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3858F9A9272B90E30066B0F0 /* CleanOCTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleanOCTests.m; sourceTree = "<group>"; };
+		3858F9AB272B90E30066B0F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3863CB8F26F3098B00D023B6 /* BestPractice.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BestPractice.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3863CB9326F3098B00D023B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3863CB9826F3098B00D023B6 /* BestPracticeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BestPracticeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -66,6 +88,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3858F999272B90E20066B0F0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3858F9A1272B90E30066B0F0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3858F9A5272B90E30066B0F0 /* CleanOC.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3863CB8C26F3098B00D023B6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -120,11 +157,31 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		3858F99D272B90E20066B0F0 /* CleanOC */ = {
+			isa = PBXGroup;
+			children = (
+				3858F99E272B90E20066B0F0 /* CleanOC.h */,
+				3858F99F272B90E20066B0F0 /* Info.plist */,
+			);
+			path = CleanOC;
+			sourceTree = "<group>";
+		};
+		3858F9A8272B90E30066B0F0 /* CleanOCTests */ = {
+			isa = PBXGroup;
+			children = (
+				3858F9A9272B90E30066B0F0 /* CleanOCTests.m */,
+				3858F9AB272B90E30066B0F0 /* Info.plist */,
+			);
+			path = CleanOCTests;
+			sourceTree = "<group>";
+		};
 		3863CB8526F3098B00D023B6 = {
 			isa = PBXGroup;
 			children = (
 				3863CB9126F3098B00D023B6 /* BestPractice */,
 				3863CB9C26F3098B00D023B6 /* BestPracticeTests */,
+				3858F99D272B90E20066B0F0 /* CleanOC */,
+				3858F9A8272B90E30066B0F0 /* CleanOCTests */,
 				3863CB9026F3098B00D023B6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -134,6 +191,8 @@
 			children = (
 				3863CB8F26F3098B00D023B6 /* BestPractice.framework */,
 				3863CB9826F3098B00D023B6 /* BestPracticeTests.xctest */,
+				3858F99C272B90E20066B0F0 /* CleanOC.framework */,
+				3858F9A4272B90E30066B0F0 /* CleanOCTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -164,6 +223,9 @@
 				38741C1E26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift */,
 				3847FDDF26F5FB050033DB78 /* PrimaryMessageImageDataLoaderWithFallbackTests.swift */,
 				3867EFDB2701615A00CF6806 /* CombineTests.swift */,
+				38229F382706728800335166 /* Date-iso8601Tests.swift */,
+				38387495270AAD0C0033B4F6 /* GCDTests.swift */,
+				3858F995272A94C60066B0F0 /* HhhTests.swift */,
 			);
 			path = BestPracticeTests;
 			sourceTree = "<group>";
@@ -180,6 +242,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		3858F997272B90E20066B0F0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3858F9AC272B90E30066B0F0 /* CleanOC.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3863CB8A26F3098B00D023B6 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -190,6 +260,42 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		3858F99B272B90E20066B0F0 /* CleanOC */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3858F9B1272B90E30066B0F0 /* Build configuration list for PBXNativeTarget "CleanOC" */;
+			buildPhases = (
+				3858F997272B90E20066B0F0 /* Headers */,
+				3858F998272B90E20066B0F0 /* Sources */,
+				3858F999272B90E20066B0F0 /* Frameworks */,
+				3858F99A272B90E20066B0F0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CleanOC;
+			productName = CleanOC;
+			productReference = 3858F99C272B90E20066B0F0 /* CleanOC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		3858F9A3272B90E30066B0F0 /* CleanOCTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3858F9B2272B90E30066B0F0 /* Build configuration list for PBXNativeTarget "CleanOCTests" */;
+			buildPhases = (
+				3858F9A0272B90E30066B0F0 /* Sources */,
+				3858F9A1272B90E30066B0F0 /* Frameworks */,
+				3858F9A2272B90E30066B0F0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3858F9A7272B90E30066B0F0 /* PBXTargetDependency */,
+			);
+			name = CleanOCTests;
+			productName = CleanOCTests;
+			productReference = 3858F9A4272B90E30066B0F0 /* CleanOCTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		3863CB8E26F3098B00D023B6 /* BestPractice */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3863CBA326F3098B00D023B6 /* Build configuration list for PBXNativeTarget "BestPractice" */;
@@ -235,6 +341,12 @@
 				LastSwiftUpdateCheck = 1250;
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
+					3858F99B272B90E20066B0F0 = {
+						CreatedOnToolsVersion = 12.5.1;
+					};
+					3858F9A3272B90E30066B0F0 = {
+						CreatedOnToolsVersion = 12.5.1;
+					};
 					3863CB8E26F3098B00D023B6 = {
 						CreatedOnToolsVersion = 12.5.1;
 						LastSwiftMigration = 1250;
@@ -260,11 +372,27 @@
 			targets = (
 				3863CB8E26F3098B00D023B6 /* BestPractice */,
 				3863CB9726F3098B00D023B6 /* BestPracticeTests */,
+				3858F99B272B90E20066B0F0 /* CleanOC */,
+				3858F9A3272B90E30066B0F0 /* CleanOCTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3858F99A272B90E20066B0F0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3858F9A2272B90E30066B0F0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3863CB8D26F3098B00D023B6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -282,6 +410,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3858F998272B90E20066B0F0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3858F9A0272B90E30066B0F0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3858F9AA272B90E30066B0F0 /* CleanOCTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3863CB8B26F3098B00D023B6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -307,17 +450,25 @@
 				3867EFDC2701615A00CF6806 /* CombineTests.swift in Sources */,
 				38741C1826F433C2008229A1 /* URLSessionHTTPClientTests.swift in Sources */,
 				38741C1D26F44016008229A1 /* XCTestCase+TrackForMemoryLeak.swift in Sources */,
+				3858F996272A94C60066B0F0 /* HhhTests.swift in Sources */,
 				38741C1B26F43CDB008229A1 /* XCTestCase+sharedTestHelpers.swift in Sources */,
 				38741C1F26F58EBB008229A1 /* LoadFeedImageDataFromCacheUseCaseTests.swift in Sources */,
 				38105E1C26F834CA00A36641 /* LoadFeedFromCacheUseCaseTests.swift in Sources */,
 				38105E1226F8166E00A36641 /* CacheFeedUseCaseTests.swift in Sources */,
 				38105E2226F86B1A00A36641 /* FeedStoreSpy.swift in Sources */,
+				38229F392706728800335166 /* Date-iso8601Tests.swift in Sources */,
+				38387496270AAD0C0033B4F6 /* GCDTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3858F9A7272B90E30066B0F0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3858F99B272B90E20066B0F0 /* CleanOC */;
+			targetProxy = 3858F9A6272B90E30066B0F0 /* PBXContainerItemProxy */;
+		};
 		3863CB9B26F3098B00D023B6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3863CB8E26F3098B00D023B6 /* BestPractice */;
@@ -326,6 +477,86 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		3858F9AD272B90E30066B0F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = M473HHV7M5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = CleanOC/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zky.SwiftEcstasis.CleanOC;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		3858F9AE272B90E30066B0F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = M473HHV7M5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = CleanOC/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zky.SwiftEcstasis.CleanOC;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		3858F9AF272B90E30066B0F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = M473HHV7M5;
+				INFOPLIST_FILE = CleanOCTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zky.SwiftEcstasis.CleanOCTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		3858F9B0272B90E30066B0F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = M473HHV7M5;
+				INFOPLIST_FILE = CleanOCTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zky.SwiftEcstasis.CleanOCTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		3863CBA126F3098B00D023B6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -465,6 +696,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zky.SwiftEcstasis.BestPractice;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -491,6 +723,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zky.SwiftEcstasis.BestPractice;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -542,6 +775,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3858F9B1272B90E30066B0F0 /* Build configuration list for PBXNativeTarget "CleanOC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3858F9AD272B90E30066B0F0 /* Debug */,
+				3858F9AE272B90E30066B0F0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3858F9B2272B90E30066B0F0 /* Build configuration list for PBXNativeTarget "CleanOCTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3858F9AF272B90E30066B0F0 /* Debug */,
+				3858F9B0272B90E30066B0F0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3863CB8926F3098B00D023B6 /* Build configuration list for PBXProject "BestPractice" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
